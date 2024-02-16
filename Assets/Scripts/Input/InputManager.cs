@@ -27,14 +27,14 @@ public class InputManager : MonoBehaviour
     // Input Actions Asset
     private PlayerInput playerInput;
 
-    // Move "WASD" & Left Stick
+    // Move "WASD"
     public Vector2 movement {get; private set;}
     public bool left {get; private set;}
     public bool right {get; private set;}
 
-    // Fire
+    // Fire "Space"
     public bool firePressed {get; private set;}
 
-    // Restart
+    // Restart "R"
     public bool restartPressed {get; private set;}
 }
