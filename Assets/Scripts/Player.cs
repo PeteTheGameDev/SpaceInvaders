@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
 
     public void Start()
     {
-        input = GetComponentInChildren<InputManager>();
+        input = FindObjectOfType<InputManager>();
     }
 
     public void Update()
@@ -59,8 +59,8 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Missile") ||
-            other.gameObject.layer == LayerMask.NameToLayer("Invader")) {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Missile") || other.gameObject.layer == LayerMask.NameToLayer("Invader")) 
+        {
             GameManager.Instance.OnPlayerKilled(this);
         }
     }

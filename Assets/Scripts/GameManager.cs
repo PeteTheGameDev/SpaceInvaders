@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public sealed class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    private InputManager input;
 
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private Text scoreText;
@@ -22,9 +23,12 @@ public sealed class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null) {
+        if (Instance != null) 
+        {
             DestroyImmediate(gameObject);
-        } else {
+        } 
+        else 
+        {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
@@ -36,13 +40,15 @@ public sealed class GameManager : MonoBehaviour
         invaders = FindObjectOfType<Invaders>();
         mysteryShip = FindObjectOfType<MysteryShip>();
         bunkers = FindObjectsOfType<Bunker>();
+        input = FindObjectOfType<InputManager>();
 
         NewGame();
     }
 
     private void Update()
     {
-        if (lives <= 0 && Input.GetKeyDown(KeyCode.Return)) {
+        if (lives <= 0 && input.restartPressed) 
+        {
             NewGame();
         }
     }
