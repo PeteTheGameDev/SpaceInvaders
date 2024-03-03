@@ -9,12 +9,17 @@ public class Bunker : MonoBehaviour
     private Texture2D originalTexture;
     private SpriteRenderer spriteRenderer;
     private new BoxCollider2D collider;
+    private Color[] splatPixels; // Array of textures
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         collider = GetComponent<BoxCollider2D>();
-        originalTexture = spriteRenderer.sprite.texture;
+        originalTexture = Instantiate(spriteRenderer.sprite.texture);
+        splatPixels = splat.GetPixels();
+
+        // Old Code:
+        // originalTexture = spriteRenderer.sprite.texture;
 
         ResetBunker();
     }
@@ -23,7 +28,11 @@ public class Bunker : MonoBehaviour
     {
         // Each bunker needs a unique instance of the sprite texture since we
         // will be modifying it at the source
-        CopyTexture(originalTexture);
+        // Old Code:
+        // CopyTexture(originalTexture);
+
+        spriteRenderer.sprite.texture.SetPixels32(originalTexture.GetPixels32());
+        spriteRenderer.sprite.texture.Apply();
 
         gameObject.SetActive(true);
     }
@@ -50,17 +59,22 @@ public class Bunker : MonoBehaviour
 
         // Check the hit point and each edge of the colliding object to see if
         // it splats with the bunker for more accurate collision detection
-        return Splat(hitPoint) ||
-               Splat(hitPoint + (Vector3.down * offset.y)) ||
-               Splat(hitPoint + (Vector3.up * offset.y)) ||
-               Splat(hitPoint + (Vector3.left * offset.x)) ||
-               Splat(hitPoint + (Vector3.right * offset.x));
+        foreach (Vector3 point in new Vector3[] { hitPoint,
+            hitPoint + (Vector3.down * offset.y),
+            hitPoint + (Vector3.up * offset.y),
+            hitPoint + (Vector3.left * offset.x),
+            hitPoint + (Vector3.right * offset.x) })
+        {
+            if (Splat(point)) return true;
+        }
+        return false;
     }
 
     private bool Splat(Vector3 hitPoint)
     {
         // Only proceed if the point maps to a non-empty pixel
-        if (!CheckPoint(hitPoint, out int px, out int py)) {
+        if (!CheckPoint(hitPoint, out int px, out int py)) 
+        {
             return false;
         }
 
@@ -68,29 +82,31 @@ public class Bunker : MonoBehaviour
 
         // Offset the point by half the size of the splat texture so the splat
         // is centered around the hit point
-        px -= splat.width / 2;
-        py -= splat.height / 2;
-
         int startX = px;
+        int splatWidth = splat.width;
+        int splatHeight = splat.height;
 
         // Loop through all of the coordinates in the splat texture so we can
         // alpha mask the bunker texture with the splat texture
         for (int y = 0; y < splat.height; y++)
         {
             px = startX;
+            int textureY = py + y - splatHeight / 2;
 
             for (int x = 0; x < splat.width; x++)
             {
-                // Multiply the alpha of the splat pixel with the alpha of the
-                // bunker texture to make it look like parts of the bunker are
-                // being destroyed
-                Color pixel = texture.GetPixel(px, py);
-                pixel.a *= splat.GetPixel(x, y).a;
-                texture.SetPixel(px, py, pixel);
-                px++;
-            }
+                int textureX = px + x - splatWidth / 2;
 
-            py++;
+                if (textureX >= 0 && textureX < texture.width && textureY >= 0 && textureY < texture.height)
+                {
+                    // Multiply the alpha of the splat pixel with the alpha of the
+                    // bunker texture to make it look like parts of the bunker are
+                    // being destroyed
+                    Color pixel = texture.GetPixel(textureX, textureY);
+                    pixel.a *= splatPixels[y * splatWidth + x].a;
+                    texture.SetPixel(textureX, textureY, pixel);
+                }
+            }
         }
 
         texture.Apply();
@@ -120,7 +136,8 @@ public class Bunker : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Invader")) {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Invader")) 
+        {
             gameObject.SetActive(false);
         }
     }

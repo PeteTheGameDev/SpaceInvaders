@@ -8,15 +8,22 @@ public class Projectile : MonoBehaviour
     public float speed = 20f;
 
     private new BoxCollider2D collider;
+    private Rigidbody2D rb;
 
     private void Awake()
     {
         collider = GetComponent<BoxCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        transform.position += speed * Time.deltaTime * direction;
+        // Optimized so there aren't continuous physics calculations per frame
+        // Old Code:
+        // private void Update()
+        // transform.position += speed * Time.deltaTime * direction;
+
+        rb.velocity = direction.normalized * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
