@@ -31,30 +31,16 @@ public class Bunker : MonoBehaviour
         // Old Code:
         // CopyTexture(originalTexture);
 
+        // Reset the bunker texture to its original state
         spriteRenderer.sprite.texture.SetPixels32(originalTexture.GetPixels32());
-        spriteRenderer.sprite.texture.Apply();
-
-        gameObject.SetActive(true);
+        
     }
 
-    private void CopyTexture(Texture2D source)
-    {
-        Texture2D copy = new Texture2D(source.width, source.height, source.format, false)
-        {
-            filterMode = source.filterMode,
-            anisoLevel = source.anisoLevel,
-            wrapMode = source.wrapMode
-        };
-
-        copy.SetPixels32(source.GetPixels32());
-        copy.Apply();
-
-        Sprite sprite = Sprite.Create(copy, spriteRenderer.sprite.rect, new Vector2(0.5f, 0.5f), spriteRenderer.sprite.pixelsPerUnit);
-        spriteRenderer.sprite = sprite;
-    }
+    // COPY TEXTURE FUNCTION REMOVED
 
     public bool CheckCollision(BoxCollider2D other, Vector3 hitPoint)
     {
+        // Iterate over points to check for collision
         Vector2 offset = other.size / 2;
 
         // Check the hit point and each edge of the colliding object to see if
@@ -82,7 +68,7 @@ public class Bunker : MonoBehaviour
 
         // Offset the point by half the size of the splat texture so the splat
         // is centered around the hit point
-        int startX = px;
+        // OLD: int startX = px;
         int splatWidth = splat.width;
         int splatHeight = splat.height;
 
@@ -90,7 +76,7 @@ public class Bunker : MonoBehaviour
         // alpha mask the bunker texture with the splat texture
         for (int y = 0; y < splat.height; y++)
         {
-            px = startX;
+            // px = startX;
             int textureY = py + y - splatHeight / 2;
 
             for (int x = 0; x < splat.width; x++)
